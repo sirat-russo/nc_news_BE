@@ -1,3 +1,35 @@
-# NC News Seeding
+NC News — Backend Project
 
-- Instructions for this sprint can be found at https://l2c.northcoders.com/courses/be/seeding-nc-news
+This project sets up and seeds a PostgreSQL database for the NC News API.
+
+# Setup Instructions
+
+## Requirements
+-Node.js (v18+)
+-PostgreSQL (installed and running locally)
+
+## Install dependencies
+npm install
+
+## Create the databases
+npm run setup-dbs
+
+## Environment Variables
+Create two .env files in the project root:
+
+### .env.development
+PGDATABASE=nc_news
+
+### .env.test
+PGDATABASE=nc_news_test
+
+### Ensure .gitignore contains
+.env.*
+
+## Seeding
+
+### Development data
+npm run seed-dev
+
+### Test data (and run tests)
+npm run test-seed
