@@ -1,6 +1,6 @@
 const db = require("../connection");
 const format = require("pg-format");
-const { convertTimestampToDate } = require("./utils");
+const { convertTimestampToDate, createArticleRef, makeCommentsWithArticleId  } = require("./utils");
 
 const seed = ({ topicData, userData, articleData, commentData }) => {
   return db.query(`DROP TABLE IF EXISTS comments;`)
@@ -103,23 +103,22 @@ const seed = ({ topicData, userData, articleData, commentData }) => {
       return db.query(insert);
     })
 
-  .then(({ rows }) => {
-      const titleToId = new Map(rows.map(({ article_id, title }) => [title, article_id]));
-      return titleToId;
-    })
 
-  .then((titleToId) => {
-      const formatted = commentData
-        .map(convertTimestampToDate)
-        .map(({ article_title, body, votes = 0, author, created_at }) => [
-          titleToId.get(article_title),
+  .then(({ rows: insertedArticles } = { rows: [] }) => {
+      const articleRef = createArticleRef(insertedArticles);
+      const formattedComments = makeCommentsWithArticleId(commentData, articleRef);
+
+      if (!formattedComments.length) return;
+
+      const rows = formattedComments.map(
+        ({ article_id, body, votes = 0, author, created_at }) => [
+          article_id,
           body,
           votes,
           author,
           created_at,
-        ]);
-
-      if (formatted.length === 0) return;
+        ]
+      );
 
       const insert = format(
         `
@@ -127,12 +126,11 @@ const seed = ({ topicData, userData, articleData, commentData }) => {
           (article_id, body, votes, author, created_at)
         VALUES %L;
         `,
-        formatted
+        rows
       );
 
       return db.query(insert);
     });
-}
-
+};
 
 module.exports = seed;
