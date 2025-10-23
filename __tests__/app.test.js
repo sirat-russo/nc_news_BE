@@ -174,6 +174,144 @@ describe("GET /api/articles/:article_id", () => {
   });
 });
 
+describe("GET /api/articles/:article_id/comments", () => {
+  test("200: responds with an array of comments for the given article_id", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then(({ body }) => {
+        const { comments } = body;
+        expect(Array.isArray(comments)).toBe(true);
+        expect(comments.length).toBeGreaterThan(0);
+
+        comments.forEach((comment) => {
+          expect(comment).toMatchObject({
+            comment_id: expect.any(Number),
+            votes: expect.any(Number),
+            created_at: expect.any(String),
+            author: expect.any(String),
+            body: expect.any(String),
+            article_id: 1,
+          });
+        });
+      });
+  });
+
+  test("200: comments are sorted by most recent first", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then(({ body }) => {
+        const { comments } = body;
+        expect(comments).toBeSortedBy("created_at", { descending: true });
+      });
+  });
+
+  test("200: responds with an empty array when article exists but has no comments", () => {
+    return request(app)
+      .get("/api/articles/2/comments")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comments).toEqual([]);
+      });
+  });
+
+  test("404: responds with 'Article not found' when article_id is valid but does not exist", () => {
+    return request(app)
+      .get("/api/articles/9999/comments")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Article not found");
+      });
+  });
+
+  test("400: responds with 'Bad request' when article_id is invalid", () => {
+    return request(app)
+      .get("/api/articles/not-an-id/comments")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request");
+      });
+  });
+});
+
+
+describe("POST /api/articles/:article_id/comments", () => {
+  test("201: inserts a new comment and returns the created comment", () => {
+    const newComment = {
+      username: "butter_bridge",
+      body: "This is an insightful article!",
+    };
+
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(newComment)
+      .expect(201)
+      .then(({ body }) => {
+        const { comment } = body;
+        expect(comment).toMatchObject({
+          comment_id: expect.any(Number),
+          body: "This is an insightful article!",
+          article_id: 1,
+          author: "butter_bridge",
+          votes: 0,
+          created_at: expect.any(String),
+        });
+      });
+  });
+
+  test("400: responds with 'Bad request' when article_id is invalid", () => {
+    const newComment = { username: "butter_bridge", body: "Nice post!" };
+    return request(app)
+      .post("/api/articles/not-an-id/comments")
+      .send(newComment)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request");
+      });
+  });
+
+  test("400: responds with 'Missing required fields' when username or body is missing", () => {
+    const incompleteComment = { body: "No username provided" };
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(incompleteComment)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Missing required fields");
+      });
+  });
+
+  test("404: responds with 'User or Article not found' when username does not exist", () => {
+    const invalidUserComment = {
+      username: "unknown_user",
+      body: "This user doesn't exist",
+    };
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(invalidUserComment)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("User or Article not found");
+      });
+  });
+
+  test("404: responds with 'Article not found' when article_id does not exist", () => {
+    const validComment = {
+      username: "butter_bridge",
+      body: "Great read!",
+    };
+    return request(app)
+      .post("/api/articles/9999/comments")
+      .send(validComment)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Article not found");
+      });
+  });
+});
+
+
 
 
 
