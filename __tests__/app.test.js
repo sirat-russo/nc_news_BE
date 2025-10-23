@@ -135,5 +135,45 @@ describe("GET /api/users", () => {
   });
 });
 
+describe("GET /api/articles/:article_id", () => {
+  test("200: responds with the correct article object", () => {
+    return request(app)
+      .get("/api/articles/1")
+      .expect(200)
+      .then(({ body }) => {
+        const { article } = body;
+        expect(article).toMatchObject({
+          author: expect.any(String),
+          title: expect.any(String),
+          article_id: 1,
+          body: expect.any(String),
+          topic: expect.any(String),
+          created_at: expect.any(String),
+          votes: expect.any(Number),
+          article_img_url: expect.any(String),
+        });
+      });
+  });
+
+  test("400: responds with 'Bad request' for invalid article_id type", () => {
+    return request(app)
+      .get("/api/articles/not-a-number")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request");
+      });
+  });
+
+  test("404: responds with 'Article not found' for non-existent id", () => {
+    return request(app)
+      .get("/api/articles/9999")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Article not found");
+      });
+  });
+});
+
+
 
 
