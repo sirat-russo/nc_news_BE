@@ -94,9 +94,46 @@ describe("GET /api/articles", () => {
     .then(({ body }) => {
       expect(body).toEqual({ msg: "Route not found" });
     });
+  });
+  test("500: falls through to server error handler (example)", () => {
+    expect(true).toBe(true);
+  });
 });
 
-test("500: falls through to server error handler (example)", () => {
-  expect(true).toBe(true);
+describe("GET /api/users", () => {
+  test("200: responds with { users: [...] } where each has username, name & avatar_url", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body).toHaveProperty("users");
+        const { users } = body;
+
+        expect(Array.isArray(users)).toBe(true);
+        expect(users.length).toBeGreaterThan(0);
+
+        users.forEach((user) => {
+          expect(user).toMatchObject({
+            username: expect.any(String),
+            name: expect.any(String),
+            avatar_url: expect.any(String),
+          });
+        });
+      });
+  });
+  test("404: responds with 'Route not found' for unknown paths", () => {
+    return request(app)
+      .get("/not-a-route")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body).toEqual({ msg: "Route not found" });
+      });
+  });
+
+  test("500: falls through to server error handler (example)", () => {
+    expect(true).toBe(true);
+  });
 });
-});
+
+
+
