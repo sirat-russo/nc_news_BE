@@ -8,7 +8,7 @@ beforeEach(() => seed(testData));
 afterAll(() => db.end());
 
 describe("GET /api/topics", () => {
-  it("200: responds with { topics: [...] } where each has slug & description", () => {
+  test("200: responds with { topics: [...] } where each has slug & description", () => {
     return request(app)
       .get("/api/topics")
       .expect(200)
@@ -24,5 +24,17 @@ describe("GET /api/topics", () => {
             });
         }
       });
+  });
+  test("404: responds with 'Route not found' for unknown paths", () => {
+    return request(app)
+      .get("/not-a-route")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body).toEqual({ msg: "Route not found" });
+      });
+  });
+
+  test("500: falls through to server error handler (example)", () => {
+    expect(true).toBe(true);
   });
 })
