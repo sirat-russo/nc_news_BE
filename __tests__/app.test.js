@@ -492,6 +492,92 @@ describe("GET /api/articles (sorting queries)", () => {
         expect(body.msg).toBe("Invalid order");
       });
   });
+
+
+
+  // topic filtering tests
+
+test("200: filters articles by a valid topic (e.g. 'mitch')", () => {
+  return request(app)
+    .get("/api/articles?topic=mitch")
+    .expect(200)
+    .then(({ body }) => {
+      expect(body).toHaveProperty("articles");
+      const { articles } = body;
+
+      expect(Array.isArray(articles)).toBe(true);
+      expect(articles.length).toBeGreaterThan(0);
+
+      for (const article of articles) {
+        expect(article.topic).toBe("mitch");
+        expect(article).toEqual(
+          expect.objectContaining({
+            author: expect.any(String),
+            title: expect.any(String),
+            article_id: expect.any(Number),
+            topic: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            article_img_url: expect.any(String),
+            comment_count: expect.any(Number),
+          })
+        );
+      }
+      expect(articles).toBeSortedBy("created_at", { descending: true });
+    });
+});
+
+test("200: valid topic with no associated articles returns an empty array", () => {
+  return request(app)
+    .get("/api/articles?topic=paper")
+    .expect(200)
+    .then(({ body }) => {
+      expect(body).toHaveProperty("articles");
+      expect(body.articles).toEqual([]);
+    });
+});
+
+test("404: responds with 'Topic not found' when topic does not exist", () => {
+  return request(app)
+    .get("/api/articles?topic=this-topic-does-not-exist")
+    .expect(404)
+    .then(({ body }) => {
+      expect(body.msg).toBe("Topic not found");
+    });
+});
+
+test("200: topic filter works together with sort_by and order", () => {
+  return request(app)
+    .get("/api/articles?topic=mitch&sort_by=votes&order=asc")
+    .expect(200)
+    .then(({ body }) => {
+      const { articles } = body;
+      expect(articles.length).toBeGreaterThan(0);
+      for (const article of articles) {
+        expect(article.topic).toBe("mitch");
+      }
+      expect(articles).toBeSortedBy("votes", { descending: false });
+    });
+});
+
+test("400: invalid sort_by is still rejected even when topic is provided", () => {
+  return request(app)
+    .get("/api/articles?topic=mitch&sort_by=not-a-column")
+    .expect(400)
+    .then(({ body }) => {
+      expect(body.msg).toBe("Invalid sort_by");
+    });
+});
+
+test("400: invalid order is still rejected even when topic is provided", () => {
+  return request(app)
+    .get("/api/articles?topic=mitch&order=sideways")
+    .expect(400)
+    .then(({ body }) => {
+      expect(body.msg).toBe("Invalid order");
+    });
+  });
+
 });
 
 

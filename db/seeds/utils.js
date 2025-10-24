@@ -1,4 +1,5 @@
 const db = require("../../db/connection");
+const format = require("pg-format");
 
 exports.convertTimestampToDate = ({ created_at, ...otherProperties }) => {
   if (!created_at) return { ...otherProperties };
@@ -27,6 +28,15 @@ exports.makeCommentsWithArticleId = (comments = [], articleRef = {}) => {
       article_id,
     };
   });
+};
+
+exports.checkExists = async (table, column, value) => {
+  const queryStr = format("SELECT 1 FROM %I WHERE %I = $1;", table, column);
+  const { rows } = await db.query(queryStr, [value]);
+
+  if (rows.length === 0) {
+    return Promise.reject({ status: 404, msg: "Topic not found" });
+  }
 };
 
 

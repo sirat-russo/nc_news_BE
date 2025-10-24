@@ -1,6 +1,7 @@
 const db = require("../db/connection");
+const { checkExists } = require("../db/seeds/utils");
 
-exports.selectArticles = ({ sort_by = "created_at", order = "desc" } = {}) => {
+exports.selectArticles = ({ sort_by = "created_at", order = "desc", topic } = {}) => {
   const allowedSorts = [
     "author",
     "title",
@@ -25,6 +26,13 @@ exports.selectArticles = ({ sort_by = "created_at", order = "desc" } = {}) => {
 
   const sortIdentifier = sort_by === "comment_count" ? "comment_count" : `a.${sort_by}`;
 
+  const params = [];
+  let whereClause = "";
+  if (topic) {
+    params.push(topic);
+    whereClause = `WHERE a.topic = $1`;
+  }
+  
   const queryStr = `
     SELECT 
       a.author,
@@ -37,11 +45,17 @@ exports.selectArticles = ({ sort_by = "created_at", order = "desc" } = {}) => {
       COUNT(c.comment_id)::INT AS comment_count
     FROM articles a
     LEFT JOIN comments c ON a.article_id = c.article_id
+    ${whereClause} 
     GROUP BY a.article_id
     ORDER BY ${sortIdentifier} ${normalisedOrder.toUpperCase()};
   `;
 
-  return db.query(queryStr).then(({ rows }) => rows);
+  return db.query(queryStr, params).then(({ rows }) => {
+    if (topic && rows.length === 0) {
+        return checkExists("topics", "slug", topic).then(() => rows);
+      }
+      return rows;
+    });  
 };
 
 exports.selectArticleById = (article_id) => {
