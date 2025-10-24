@@ -1,6 +1,30 @@
 const db = require("../db/connection");
 
-exports.selectArticles = () => {
+exports.selectArticles = ({ sort_by = "created_at", order = "desc" } = {}) => {
+  const allowedSorts = [
+    "author",
+    "title",
+    "article_id",
+    "topic",
+    "created_at",
+    "votes",
+    "article_img_url",
+    "comment_count",
+  ];
+
+  const allowedOrders = ["asc", "desc"];
+
+  const normalisedOrder = String(order).toLowerCase();
+
+  if (!allowedSorts.includes(sort_by)) {
+    return Promise.reject({ status: 400, msg: "Invalid sort_by" });
+  }
+  if (!allowedOrders.includes(normalisedOrder)) {
+    return Promise.reject({ status: 400, msg: "Invalid order" });
+  }
+
+  const sortIdentifier = sort_by === "comment_count" ? "comment_count" : `a.${sort_by}`;
+
   const queryStr = `
     SELECT 
       a.author,
@@ -14,7 +38,7 @@ exports.selectArticles = () => {
     FROM articles a
     LEFT JOIN comments c ON a.article_id = c.article_id
     GROUP BY a.article_id
-    ORDER BY a.created_at DESC;
+    ORDER BY ${sortIdentifier} ${normalisedOrder.toUpperCase()};
   `;
 
   return db.query(queryStr).then(({ rows }) => rows);

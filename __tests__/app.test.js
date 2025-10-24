@@ -421,5 +421,79 @@ describe("DELETE /api/comments/:comment_id", () => {
   });
 });
 
+describe("GET /api/articles (sorting queries)", () => {
+  test("200: sorts by a valid column (votes) ascending when given sort_by=votes&order=asc", () => {
+    return request(app)
+      .get("/api/articles?sort_by=votes&order=asc")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(Array.isArray(articles)).toBe(true);
+        expect(articles.length).toBeGreaterThan(0);
+        expect(articles).toBeSortedBy("votes", { ascending: true });
+      });
+  });
+
+  test("200: sorts by author descending when given sort_by=author (default order=desc)", () => {
+    return request(app)
+      .get("/api/articles?sort_by=author")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles).toBeSortedBy("author", { descending: true });
+      });
+  });
+
+  test("200: responds with articles sorted by title in descending order", () => {
+  return request(app)
+    .get("/api/articles?sort_by=title&order=desc")
+    .expect(200)
+    .then(({ body }) => {
+      const { articles } = body;
+      expect(articles).toBeSortedBy("title", { descending: true });
+    });
+  });
+
+  test("200: responds with articles sorted by votes in ascending order", () => {
+  return request(app)
+    .get("/api/articles?sort_by=votes&order=asc")
+    .expect(200)
+    .then(({ body }) => {
+      const { articles } = body;
+      expect(articles).toBeSortedBy("votes", { descending: false });
+    });
+  });
+
+  test("200: responds with articles sorted by comment_count in descending order", () => {
+  return request(app)
+    .get("/api/articles?sort_by=comment_count&order=desc")
+    .expect(200)
+    .then(({ body }) => {
+      const { articles } = body;
+      expect(articles).toBeSortedBy("comment_count", { descending: true });
+    });
+
+  });
+
+  test("400: responds with 'Invalid sort_by' when column is not allowed", () => {
+    return request(app)
+      .get("/api/articles?sort_by=not_a_column")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid sort_by");
+      });
+  });
+
+  test("400: responds with 'Invalid order' when order is not 'asc' or 'desc'", () => {
+    return request(app)
+      .get("/api/articles?order=sideways")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid order");
+      });
+  });
+});
+
+
 
 
