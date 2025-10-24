@@ -493,12 +493,12 @@ describe("GET /api/articles (sorting queries)", () => {
       });
   });
 
+});
 
-
-  // topic filtering tests
-
-test("200: filters articles by a valid topic (e.g. 'mitch')", () => {
-  return request(app)
+describe("GET /api/articles (topic filtering)", () => {
+  
+  test("200: filters articles by a valid topic (e.g. 'mitch')", () => {
+    return request(app)
     .get("/api/articles?topic=mitch")
     .expect(200)
     .then(({ body }) => {
@@ -525,29 +525,29 @@ test("200: filters articles by a valid topic (e.g. 'mitch')", () => {
       }
       expect(articles).toBeSortedBy("created_at", { descending: true });
     });
-});
-
-test("200: valid topic with no associated articles returns an empty array", () => {
-  return request(app)
+  });
+  
+  test("200: valid topic with no associated articles returns an empty array", () => {
+    return request(app)
     .get("/api/articles?topic=paper")
     .expect(200)
     .then(({ body }) => {
       expect(body).toHaveProperty("articles");
       expect(body.articles).toEqual([]);
     });
-});
-
-test("404: responds with 'Topic not found' when topic does not exist", () => {
-  return request(app)
+  });
+  
+  test("404: responds with 'Topic not found' when topic does not exist", () => {
+    return request(app)
     .get("/api/articles?topic=this-topic-does-not-exist")
     .expect(404)
     .then(({ body }) => {
       expect(body.msg).toBe("Topic not found");
     });
-});
-
-test("200: topic filter works together with sort_by and order", () => {
-  return request(app)
+  });
+  
+  test("200: topic filter works together with sort_by and order", () => {
+    return request(app)
     .get("/api/articles?topic=mitch&sort_by=votes&order=asc")
     .expect(200)
     .then(({ body }) => {
@@ -558,28 +558,76 @@ test("200: topic filter works together with sort_by and order", () => {
       }
       expect(articles).toBeSortedBy("votes", { descending: false });
     });
-});
-
-test("400: invalid sort_by is still rejected even when topic is provided", () => {
-  return request(app)
+  });
+  
+  test("400: invalid sort_by is still rejected even when topic is provided", () => {
+    return request(app)
     .get("/api/articles?topic=mitch&sort_by=not-a-column")
     .expect(400)
     .then(({ body }) => {
       expect(body.msg).toBe("Invalid sort_by");
     });
-});
-
-test("400: invalid order is still rejected even when topic is provided", () => {
-  return request(app)
+  });
+  
+  test("400: invalid order is still rejected even when topic is provided", () => {
+    return request(app)
     .get("/api/articles?topic=mitch&order=sideways")
     .expect(400)
     .then(({ body }) => {
       expect(body.msg).toBe("Invalid order");
     });
   });
-
 });
 
+describe("GET /api/articles/:article_id (comment_count)", () => {
 
+  test("200: responds with the requested article including comment_count as a number", () => {
+    return request(app)
+      .get("/api/articles/1")
+      .expect(200)
+      .then(({ body }) => {
+        const { article } = body;
+        expect(article).toHaveProperty("comment_count", expect.any(Number));
+        expect(article).toMatchObject({
+          article_id: 1,
+          author: expect.any(String),
+          title: expect.any(String),
+          topic: expect.any(String),
+          body: expect.any(String),
+          article_img_url: expect.any(String),
+          created_at: expect.any(String),
+          votes: expect.any(Number),
+          comment_count: expect.any(Number),
+        });
+      });
+  });
 
+  test("200: article with zero comments still returns comment_count: 0", () => {
+    return request(app)
+      .get("/api/articles/12")
+      .expect(200)
+      .then(({ body }) => {
+        const { article } = body;
+        expect(article.article_id).toBe(12);
+        expect(article.comment_count).toBe(0);
+      });
+  });
 
+  test("400: responds with 'Bad request' when article_id is invalid", () => {
+    return request(app)
+      .get("/api/articles/not-an-id")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request");
+      });
+  });
+
+  test("404: responds with 'Article not found' when article_id does not exist", () => {
+    return request(app)
+      .get("/api/articles/9999")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Article not found");
+      });
+  });
+});
