@@ -3,7 +3,7 @@ const { getTopics } = require("./controllers/topics.controller");
 const { getArticles, getArticleById, patchArticleById } = require("./controllers/articles.controller");
 const { getUsers } = require("./controllers/users.controller");
 const { getCommentsByArticleId, postCommentByArticleId, deleteCommentById } = require("./controllers/comments.controller");
-
+const { getApi } = require("./controllers/api.controller");
 
 
 
@@ -11,6 +11,8 @@ const { getCommentsByArticleId, postCommentByArticleId, deleteCommentById } = re
 const app = express();
 
 app.use(express.json());
+
+
 
 app.get("/api/topics", getTopics);
 
@@ -27,6 +29,8 @@ app.post("/api/articles/:article_id/comments", postCommentByArticleId);
 app.patch("/api/articles/:article_id", patchArticleById);
 
 app.delete("/api/comments/:comment_id", deleteCommentById);
+
+app.get("/api", getApi);
 
 
 
