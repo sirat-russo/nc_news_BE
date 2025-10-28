@@ -3,11 +3,143 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Northcoders News API — Docs</title>
+    <title>NC News API Documentation</title>
 </head>
 <body>
-    <h1>Northcoders News API</h1>
-    <p>Hello from <code>public/index.html</code> — this is the docs placeholder.</p>
+    <header>
+      <h1>NC News API</h1>
+      <p>This API provides access to articles, topics, users and comments.</p>
+
+      <nav>
+        <ul>
+          <li><a href="#get-topics">GET /api/topics</a></li>
+          <li><a href="#get-articles">GET /api/articles</a></li>
+          <li><a href="#get-article">GET /api/articles/:article_id</a></li>
+          <li><a href="#get-article-comments">GET /api/articles/:article_id/comments</a></li>
+          <li><a href="#post-comment">POST /api/articles/:article_id/comments</a></li>
+          <li><a href="#patch-article">PATCH /api/articles/:article_id</a></li>
+          <li><a href="#delete-comment">DELETE /api/comments/:comment_id</a></li>
+          <li><a href="#get-users">GET /api/users</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+
+      <section id="get-topics">
+        <h2>GET /api/topics</h2>
+        <p>Returns all topics.</p>
+
+        <h3>Example Response:</h3>
+        <pre>{
+  "topics": [
+    { "slug": "coding", "description": "Code is love, code is life", "img_url": "https://..." }
+  ]
+}</pre>
+      </section>
+
+      <section id="get-articles">
+        <h2>GET /api/articles</h2>
+        <p>Returns an array of articles.</p>
+
+        <h3>Available Query Parameters:</h3>
+        <ul>
+          <li><strong>sort_by</strong> - column to sort articles by</li>
+          <li><strong>order</strong> - asc or desc</li>
+          <li><strong>topic</strong> - filter articles by topic</li>
+        </ul>
+
+        <h3>Example Response (shortened):</h3>
+        <pre>{
+  "articles": [
+    {
+      "article_id": 1,
+      "title": "Running a Node App",
+      "topic": "coding",
+      "author": "butter_bridge",
+      "comment_count": 17
+    }
+  ]
+}</pre>
+      </section>
+
+      <section id="get-article">
+        <h2>GET /api/articles/:article_id</h2>
+        <p>Returns a single article by ID.</p>
+
+        <h3>Example Request:</h3>
+        <p>/api/articles/1</p>
+
+        <h3>Example Response:</h3>
+        <pre>{
+  "article": {
+    "article_id": 1,
+    "title": "Running a Node App",
+    "author": "butter_bridge",
+    "votes": 100
+  }
+}</pre>
+      </section>
+
+      <section id="get-article-comments">
+        <h2>GET /api/articles/:article_id/comments</h2>
+        <p>Returns comments for the specified article.</p>
+
+        <h3>Example Response:</h3>
+        <pre>{
+  "comments": [
+    {
+      "comment_id": 18,
+      "body": "Great read!",
+      "author": "tickle122"
+    }
+  ]
+}</pre>
+      </section>
+
+      <section id="post-comment">
+        <h2>POST /api/articles/:article_id/comments</h2>
+        <p>Posts a new comment.</p>
+
+        <h3>Request Body:</h3>
+        <pre>{
+  "username": "butter_bridge",
+  "body": "My comment text"
+}</pre>
+      </section>
+
+      <section id="patch-article">
+        <h2>PATCH /api/articles/:article_id</h2>
+        <p>Updates an article's vote count.</p>
+
+        <h3>Request Body:</h3>
+        <pre>{
+  "inc_votes": 1
+}</pre>
+      </section>
+
+      <section id="delete-comment">
+        <h2>DELETE /api/comments/:comment_id</h2>
+        <p>Deletes a comment. Responds with no body.</p>
+      </section>
+
+      <section id="get-users">
+        <h2>GET /api/users</h2>
+        <p>Returns all users.</p>
+
+        <h3>Example Response:</h3>
+        <pre>{
+  "users": [
+    { "username": "butter_bridge", "name": "Jonny" }
+  ]
+}</pre>
+      </section>
+
+    </main>
+
+    <footer>
+      <p>NC News API Documentation</p>
+    </footer>
     
 </body>
 </html>
