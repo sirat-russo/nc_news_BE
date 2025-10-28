@@ -6,13 +6,13 @@ const { getCommentsByArticleId, postCommentByArticleId, deleteCommentById } = re
 const { getApi } = require("./controllers/api.controller");
 
 
-
+const path = require("path");
 
 const app = express();
 
 app.use(express.json());
 
-
+app.use("/api", express.static(path.join(__dirname, "public")));
 
 app.get("/api/topics", getTopics);
 
@@ -30,7 +30,7 @@ app.patch("/api/articles/:article_id", patchArticleById);
 
 app.delete("/api/comments/:comment_id", deleteCommentById);
 
-app.get("/api", getApi);
+app.get("/api.json", getApi);
 
 
 
