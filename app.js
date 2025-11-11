@@ -3,12 +3,14 @@ const { getTopics } = require("./controllers/topics.controller");
 const { getArticles, getArticleById, patchArticleById } = require("./controllers/articles.controller");
 const { getUsers } = require("./controllers/users.controller");
 const { getCommentsByArticleId, postCommentByArticleId, deleteCommentById } = require("./controllers/comments.controller");
-
+const cors = require('cors');
 
 
 const path = require("path");
 
 const app = express();
+
+app.use(cors());
 
 app.use(express.json());
 
