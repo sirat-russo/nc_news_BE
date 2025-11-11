@@ -3,7 +3,7 @@ const { getTopics } = require("./controllers/topics.controller");
 const { getArticles, getArticleById, patchArticleById } = require("./controllers/articles.controller");
 const { getUsers } = require("./controllers/users.controller");
 const { getCommentsByArticleId, postCommentByArticleId, deleteCommentById } = require("./controllers/comments.controller");
-//const { getApi } = require("./controllers/api.controller");
+
 
 
 const path = require("path");
@@ -30,7 +30,7 @@ app.patch("/api/articles/:article_id", patchArticleById);
 
 app.delete("/api/comments/:comment_id", deleteCommentById);
 
-//app.get("/api.json", getApi);
+
 
 
 

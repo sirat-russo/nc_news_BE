@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NC News API Documentation</title>
+    <link rel="stylesheet" href="style.css">
+
+    
 </head>
 <body>
     <header>
@@ -27,7 +30,7 @@
     <main>
 
       <section id="get-topics">
-        <h2>GET /api/topics</h2>
+        <h2><span class="badge" data-method="GET">GET</span> /api/topics</h2>
         <p>Returns all topics.</p>
 
         <h3>Example Response:</h3>
@@ -39,15 +42,38 @@
       </section>
 
       <section id="get-articles">
-        <h2>GET /api/articles</h2>
+        <h2><span class="badge" data-method="GET">GET</span> /api/articles</h2>
+
         <p>Returns an array of articles.</p>
 
         <h3>Available Query Parameters:</h3>
-        <ul>
-          <li><strong>sort_by</strong> - column to sort articles by</li>
-          <li><strong>order</strong> - asc or desc</li>
-          <li><strong>topic</strong> - filter articles by topic</li>
-        </ul>
+        <table class="params">
+          <thead>
+            <tr>
+              <th>Parameter</th>
+              <th>Type</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>sort_by</td>
+              <td>string</td>
+              <td>Column to sort by (e.g., created_at, votes)</td>
+            </tr>
+            <tr>
+              <td>order</td>
+              <td>string</td>
+              <td>Sorting order (asc or desc)</td>
+            </tr>
+            <tr>
+              <td>topic</td>
+              <td>string</td>
+              <td>Filter articles by topic</td>
+            </tr>
+          </tbody>
+        </table>
+
 
         <h3>Example Response (shortened):</h3>
         <pre>{
@@ -64,7 +90,8 @@
       </section>
 
       <section id="get-article">
-        <h2>GET /api/articles/:article_id</h2>
+        <h2><span class="badge" data-method="GET">GET</span> /api/articles/:article_id</h2>
+
         <p>Returns a single article by ID.</p>
 
         <h3>Example Request:</h3>
@@ -82,7 +109,8 @@
       </section>
 
       <section id="get-article-comments">
-        <h2>GET /api/articles/:article_id/comments</h2>
+        <h2><span class="badge" data-method="GET">GET</span> /api/articles/:article_id/comments</h2>
+
         <p>Returns comments for the specified article.</p>
 
         <h3>Example Response:</h3>
@@ -98,7 +126,8 @@
       </section>
 
       <section id="post-comment">
-        <h2>POST /api/articles/:article_id/comments</h2>
+        <h2><span class="badge" data-method="POST">POST</span> /api/articles/:article_id/comments</h2>
+
         <p>Posts a new comment.</p>
 
         <h3>Request Body:</h3>
@@ -109,7 +138,8 @@
       </section>
 
       <section id="patch-article">
-        <h2>PATCH /api/articles/:article_id</h2>
+        <h2><span class="badge" data-method="PATCH">PATCH</span> /api/articles/:article_id</h2>
+
         <p>Updates an article's vote count.</p>
 
         <h3>Request Body:</h3>
@@ -119,12 +149,14 @@
       </section>
 
       <section id="delete-comment">
-        <h2>DELETE /api/comments/:comment_id</h2>
+        <h2><span class="badge" data-method="DELETE">DELETE</span> /api/comments/:comment_id</h2>
+
         <p>Deletes a comment. Responds with no body.</p>
       </section>
 
       <section id="get-users">
-        <h2>GET /api/users</h2>
+        <h2><span class="badge" data-method="GET">GET</span> /api/users</h2>
+
         <p>Returns all users.</p>
 
         <h3>Example Response:</h3>
